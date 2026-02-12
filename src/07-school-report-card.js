@@ -42,4 +42,74 @@
  */
 export function generateReportCard(student) {
   // Your code here
+
+  if (typeof student !== 'object' || student === null) return null;
+
+  if (typeof student.name !== 'string' || student.name.trim() === '') return null;
+
+  if (typeof student.marks !== 'object' || student.marks === null) return null;
+
+  let subjects = Object.keys(student.marks);
+
+  if (subjects.length === 0) return null;
+
+  let totalMarks = 0;
+  let highestSubject = '';
+  let lowestSubject = '';
+  let highestMarks = -1;
+  let lowestMarks = 101;
+
+  let passedSubjects = [];
+  let failedSubjects = [];
+
+  for (let i = 0; i < subjects.length; i++) {
+    let subject = subjects[i];
+    let mark = student.marks[subject];
+
+    if (!Number.isFinite(mark) || mark < 0 || mark > 100) return null;
+
+    totalMarks += mark;
+
+    if (mark > highestMarks) {
+      highestMarks = mark;
+      highestSubject = subject;
+    }
+
+    if (mark < lowestMarks) {
+      lowestMarks = mark;
+      lowestSubject = subject;
+    }
+
+    if (mark >= 40) {
+      passedSubjects.push(subject);
+    } else {
+      failedSubjects.push(subject);
+    }
+  }
+
+  let subjectCount = subjects.length;
+
+  let percentage = (totalMarks / (subjectCount * 100)) * 100;
+  percentage = parseFloat(percentage.toFixed(2));
+
+  let grade = '';
+
+  if (percentage >= 90) grade = 'A+';
+  else if (percentage >= 80) grade = 'A';
+  else if (percentage >= 70) grade = 'B';
+  else if (percentage >= 60) grade = 'C';
+  else if (percentage >= 40) grade = 'D';
+  else grade = 'F';
+
+  return {
+    name: student.name,
+    subjectCount: subjectCount,
+    totalMarks: totalMarks,
+    percentage: percentage,
+    grade: grade,
+    highestSubject: highestSubject,
+    lowestSubject: lowestSubject,
+    passedSubjects: passedSubjects,
+    failedSubjects: failedSubjects,
+  };
 }
