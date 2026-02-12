@@ -71,65 +71,61 @@
  *   //      passengers: [...], summary: { ..., allConfirmed: true }, chartPrepared: true }
  */
 export function processRailwayPNR(pnrData) {
+  // Your code here
+  
+  if (typeof pnrData !== 'object' || pnrData === null) return null;
 
-  if (typeof pnrData !== "object" || pnrData === null) return null;
-
-  if (typeof pnrData.pnr !== "string" || pnrData.pnr.length !== 10) return null;
+  if (typeof pnrData.pnr !== 'string' || pnrData.pnr.length !== 10) return null;
 
   for (let i = 0; i < pnrData.pnr.length; i++) {
-    if (pnrData.pnr[i] < "0" || pnrData.pnr[i] > "9") return null;
+    if (pnrData.pnr[i] < '0' || pnrData.pnr[i] > '9') return null;
   }
 
-  if (typeof pnrData.train !== "object" || pnrData.train === null) return null;
+  if (typeof pnrData.train !== 'object' || pnrData.train === null) return null;
 
   if (!Array.isArray(pnrData.passengers) || pnrData.passengers.length === 0) return null;
 
-  let processedPassengers = pnrData.passengers.map(p => {
+  let processedPassengers = pnrData.passengers.map((p) => {
+    let statusLabel = '';
 
-    let statusLabel = "";
-
-    if (p.current.startsWith("B") || p.current.startsWith("S")) {
-      statusLabel = "CONFIRMED";
-    }
-    else if (p.current.startsWith("WL")) {
-      statusLabel = "WAITING";
-    }
-    else if (p.current === "CAN") {
-      statusLabel = "CANCELLED";
-    }
-    else if (p.current.startsWith("RAC")) {
-      statusLabel = "RAC";
+    if (p.current.startsWith('B') || p.current.startsWith('S')) {
+      statusLabel = 'CONFIRMED';
+    } else if (p.current.startsWith('WL')) {
+      statusLabel = 'WAITING';
+    } else if (p.current === 'CAN') {
+      statusLabel = 'CANCELLED';
+    } else if (p.current.startsWith('RAC')) {
+      statusLabel = 'RAC';
     }
 
     return {
-      formattedName: p.name.padEnd(20) + "(" + p.age + "/" + p.gender + ")",
+      formattedName: p.name.padEnd(20) + '(' + p.age + '/' + p.gender + ')',
       bookingStatus: p.booking,
       currentStatus: p.current,
       statusLabel: statusLabel,
-      isConfirmed: statusLabel === "CONFIRMED"
+      isConfirmed: statusLabel === 'CONFIRMED',
     };
   });
 
   let totalPassengers = processedPassengers.length;
 
-  let confirmed = processedPassengers.filter(p => p.statusLabel === "CONFIRMED").length;
-  let waiting = processedPassengers.filter(p => p.statusLabel === "WAITING").length;
-  let cancelled = processedPassengers.filter(p => p.statusLabel === "CANCELLED").length;
-  let rac = processedPassengers.filter(p => p.statusLabel === "RAC").length;
+  let confirmed = processedPassengers.filter((p) => p.statusLabel === 'CONFIRMED').length;
+  let waiting = processedPassengers.filter((p) => p.statusLabel === 'WAITING').length;
+  let cancelled = processedPassengers.filter((p) => p.statusLabel === 'CANCELLED').length;
+  let rac = processedPassengers.filter((p) => p.statusLabel === 'RAC').length;
 
-  let allConfirmed = processedPassengers.every(p => p.statusLabel === "CONFIRMED");
+  let allConfirmed = processedPassengers.every((p) => p.statusLabel === 'CONFIRMED');
 
-  let anyWaiting = processedPassengers.some(p => p.statusLabel === "WAITING");
+  let anyWaiting = processedPassengers.some((p) => p.statusLabel === 'WAITING');
 
-  let chartPrepared = processedPassengers.every(p => p.statusLabel === "CONFIRMED");
+  // ✅ Corrected logic
+  let nonCancelled = processedPassengers.filter((p) => p.statusLabel !== 'CANCELLED');
 
-  let pnrFormatted =
-    pnrData.pnr.slice(0, 3) + "-" +
-    pnrData.pnr.slice(3, 6) + "-" +
-    pnrData.pnr.slice(6);
+  let chartPrepared = nonCancelled.length > 0 && nonCancelled.every((p) => p.statusLabel === 'CONFIRMED');
 
-  let trainInfo =
-    `Train: ${pnrData.train.number} - ${pnrData.train.name} | ${pnrData.train.from} → ${pnrData.train.to} | Class: ${pnrData.classBooked}`;
+  let pnrFormatted = pnrData.pnr.slice(0, 3) + '-' + pnrData.pnr.slice(3, 6) + '-' + pnrData.pnr.slice(6);
+
+  let trainInfo = `Train: ${pnrData.train.number} - ${pnrData.train.name} | ${pnrData.train.from} → ${pnrData.train.to} | Class: ${pnrData.classBooked}`;
 
   return {
     pnrFormatted,
@@ -142,8 +138,8 @@ export function processRailwayPNR(pnrData) {
       cancelled,
       rac,
       allConfirmed,
-      anyWaiting
+      anyWaiting,
     },
-    chartPrepared
+    chartPrepared,
   };
 }
